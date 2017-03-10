@@ -53,18 +53,10 @@ export default Ember.Component.extend({
   activeDescendants: filterBy('options', 'selected'),
   activeDescendant: reads('activeDescendants.firstObject'),
 
-  searchString: null,
+  query: null,
   isActive: alias('popup.isActive'),
 
   prompt: null,
-
-  addTarget: Ember.on('didInsertElement', function () {
-    next(this, function () {
-      get(this, 'popup').addTarget(get(this, 'label'), {
-        on: "click hold"
-      });
-    });
-  }),
 
   /**
     The item of the content that is currently selected.
@@ -112,10 +104,10 @@ export default Ember.Component.extend({
     Interpret keyboard events
    */
   keyDown(evt) {
-    let code = (evt.keyCode ? evt.keyCode : evt.which);
-    let search = get(this, 'searchString');
+    let code = evt.keyCode ? evt.keyCode : evt.which;
+    let query = get(this, 'query');
     let label = get(this, 'label');
-    let popup = get(this, 'popup');
+    let popover = get(this, 'popover');
     let isActive = get(this, 'isActive');
 
     // If the meta key was held, don't do anything.
@@ -135,25 +127,25 @@ export default Ember.Component.extend({
       if (isActive) {
         this.selectPrevious();
       }
-      popup.activate(label);
+      popover.activate(label);
 
       break;
     case DOWN:
       if (isActive) {
         this.selectNext();
       }
-      popup.activate(label);
+      popover.activate(label);
 
       break;
     case ESC:
-      popup.deactivate();
+      popover.hide();
 
       break;
 
     // Allow tabs to pass through
     case TAB:
     case ENTER:
-      popup.deactivate();
+      popover.hide();
       return;
 
     // A whitelist of characters to let the browser handle
@@ -176,8 +168,8 @@ export default Ember.Component.extend({
       break;
 
     case BACKSPACE:
-      if (search) {
-        set(this, 'searchString', search.slice(0, -1));
+      if (query) {
+        this.search(query.slice(0, -1));
       }
 
       break;
@@ -185,18 +177,18 @@ export default Ember.Component.extend({
       let chr = String.fromCharCode(code);
 
       // Append
-      if (search) {
-        set(this, 'searchString', search + chr);
+      if (query) {
+        this.search(query + chr);
       } else {
         if (chr === ' ') {
           if (isActive) {
-            popup.deactivate();
+            popover.hide();
           } else {
-            popup.activate(label);
+            popover.activate(label);
           }
         } else {
-          popup.activate(label);
-          set(this, 'searchString', chr);
+          popover.activate(label);
+          this.search(chr);
         }
       }
     }
@@ -222,7 +214,7 @@ export default Ember.Component.extend({
       let option = options.objectAt(Math.min(index + 1, get(options, 'length') - 1));
       if (option !== activeDescendant) {
         set(this, 'activeDescendant', option);
-        set(this, 'value', get(option, 'value'));
+        get(this, 'onchange')(get(option, 'value'));
       }
     }
   },
@@ -268,22 +260,22 @@ export default Ember.Component.extend({
     best match. After 750 milliseconds of inactivity,
     the search is reset, allowing users to search again.
    */
-  searchStringDidChange: Ember.observer('searchString', function () {
+  search(query) {
     if (this.__timer) {
       cancel(this.__timer);
     }
 
     let options = get(this, 'activeOptions');
-    let search = get(this, 'searchString');
     let searchBy = get(this, 'searchBy');
+    set(this, 'query', query);
 
-    if (options && search && searchBy) {
+    if (options && query && searchBy) {
       let length = get(options, 'length'),
           match = null,
           start,
           matchIndex;
 
-      search = search.toUpperCase();
+      query = query.toUpperCase();
 
       // Continue searching from the index of
       // the last search match
@@ -295,7 +287,7 @@ export default Ember.Component.extend({
 
       let hasMatch = function (option) {
         for (let i = 0; i < searchBy.length; i++) {
-          if (String(get(option, searchBy[i]) || '').toUpperCase().indexOf(search) === 0) {
+          if (String(get(option, searchBy[i]) || '').toUpperCase().indexOf(query) === 0) {
             return true;
           }
         }
@@ -324,15 +316,15 @@ export default Ember.Component.extend({
       // index on consective searches
       if (match != null) {
         set(this, 'activeDescendant', match);
-        set(this, 'value', get(match, 'value'));
+        get(this, 'onchange')(get(match, 'value'));
         this.__matchIndex = matchIndex;
       }
     }
 
-    if (search) {
+    if (query) {
       this.__timer = later(this, this.resetSearch, 750);
     }
-  }),
+  },
 
   /**
     Reset the `searchString`.
@@ -340,7 +332,6 @@ export default Ember.Component.extend({
   resetSearch() {
     this.__timer = null;
     this.__matchIndex = null;
-    set(this, 'searchString', null);
   },
 
   scrollActiveDescendantIntoView: Ember.on('init', Ember.observer('activeDescendant', function () {
@@ -349,7 +340,7 @@ export default Ember.Component.extend({
     if (activeDescendant && get(this, 'isActive') && get(this, 'list')) {
       let list = get(this, 'list');
       let listBox = getLayout(get(this, 'list.element'));
-      let height = getLayout(get(this, 'popup.element')).padding.height;
+      let height = getLayout(get(this, 'popover.element')).padding.height;
       let option = get(activeDescendant, 'element');
       let scrollTop = list.$().scrollTop();
       let scrollBottom = scrollTop + listBox.padding.height;
@@ -368,7 +359,14 @@ export default Ember.Component.extend({
   actions: {
     select(option) {
       get(this, 'onchange')(get(option, 'value'));
-    }
+    },
+
+    setPopover(popover) {
+      popover.addTarget(get(this, 'label'), {
+        on: "click hold"
+      });
+      set(this, 'popover', popover);
+    },
   }
 
 });

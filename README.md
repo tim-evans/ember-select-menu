@@ -1,4 +1,4 @@
-# ember-cli {{select-menu}} [![Build Status](https://travis-ci.org/paddle8/ember-select-menu.svg?branch=master)](https://travis-ci.org/paddle8/ember-select-menu)
+# ember-cli {{select-menu}} [![Build Status](https://travis-ci.org/tim-evans/ember-select-menu.svg?branch=master)](https://travis-ci.org/tim-evans/ember-select-menu)
 
 A simplified interface for custom select widgets. The handlebars is straightforward and easy to read:
 
@@ -16,17 +16,18 @@ This addon comes with baked in WAI-ARIA support for screen readers, keyboard nav
 
 ## Installation
 
-* `git clone` this repository
+* `git clone`
 * `npm install`
 * `bower install`
 
 ## Running
 
-* `ember server`
-* Visit your app at http://localhost:4200.
+* `ember serve`
+* Visit your app at [http://localhost:4200](http://localhost:4200).
 
 ## Running Tests
 
+* `npm test` (Runs `ember try:each` to test your addon against multiple Ember versions)
 * `ember test`
 * `ember test --server`
 
@@ -34,4 +35,4 @@ This addon comes with baked in WAI-ARIA support for screen readers, keyboard nav
 
 * `ember build`
 
-For more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).
+For more information on using ember-cli, visit [https://ember-cli.com/](https://ember-cli.com/).
