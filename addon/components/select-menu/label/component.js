@@ -1,24 +1,17 @@
 import Ember from "ember";
-import nearestParent from "ember-popup-menu/computed/nearest-parent";
-import stringify from "ember-popup-menu/computed/stringify";
+import $ from 'jquery';
+import stringify from '../../../computed/stringify';
+import layout from './template';
 
-var get = Ember.get;
-var set = Ember.set;
-var reads = Ember.computed.reads;
-var not = Ember.computed.not;
-var bind = Ember.run.bind;
-var keys = Ember.keys;
+const { get, set, observer, init, computed, computed: { reads, not }, run: { bind, scheduleOnce } } = Ember;
 
-var scheduleOnce = Ember.run.scheduleOnce;
-
-var $ = Ember.$;
-
-var SelectMenuLabel = Ember.View.extend({
+export default Ember.Component.extend({
 
   tagName: 'a',
 
+  layout,
+
   classNames: ['select-menu_label'],
-  templateName: 'select-menu-label',
 
   attributeBindings: ['aria-haspopup',
                       'aria-disabled',
@@ -31,29 +24,33 @@ var SelectMenuLabel = Ember.View.extend({
                       'isHovering:hover',
                       'menu.disabled:disabled'],
 
-  menu: nearestParent("select-menu"),
   prompt: reads('menu.prompt'),
 
   ariaRole: 'button',
   "aria-haspopup": 'true',
   "aria-owns": reads('menu.list.elementId'),
-  "aria-disabled": stringify("menu.disabled"),
+  "aria-disabled": stringify('menu.disabled'),
   "aria-expanded": stringify("menu.isActive"),
 
   tabindex: 0,
+
+  init() {
+    this._super(...arguments);
+    get(this, 'oninit')(this);
+  },
 
   /** @private
     Attach events to labels that having a matching for attribute to this
     select menu.
    */
-  didInsertElement: function () {
-    var selector = `label[for="${get(this, 'elementId')}"]`;
-    var eventManager = this._eventManager = {
+  didInsertElement() {
+    let selector = `label[for="${get(this, 'elementId')}"]`;
+    let eventManager = this._eventManager = {
       mouseenter: bind(this, 'set', 'isHovering', true),
       mouseleave: bind(this, 'set', 'isHovering', false)
     };
 
-    keys(eventManager).forEach(function (event) {
+    Object.keys(eventManager).forEach(function (event) {
       $(document).on(event, selector, eventManager[event]);
     });
   },
@@ -61,31 +58,29 @@ var SelectMenuLabel = Ember.View.extend({
   /** @private
     Cleanup event delegation.
    */
-  willDestroyElement: function () {
-    var selector = `label[for="${get(this, 'elementId')}"]`;
-    var eventManager = this._eventManager;
+  willDestroyElement() {
+    let selector = `label[for="${get(this, 'elementId')}"]`;
+    let eventManager = this._eventManager;
 
-    keys(eventManager).forEach(function (event) {
+    Object.keys(eventManager).forEach(function (event) {
       $(document).off(event, selector, eventManager[event]);
     });
   },
 
-  blur: function () {
+  blur() {
     set(this, 'isHovering', false);
   },
 
   activeDescendant: reads('menu.activeDescendant'),
   isPrompting: not('activeDescendant'),
 
-  activeDescendantDidChange: function () {
+  activeDescendantDidChange: observer('activeDescendant', on('init', function () {
     scheduleOnce('afterRender', this, 'sync');
-  }.observes('activeDescendant').on('init'),
+  })),
 
-  sync: function () {
-    var activeDescendant = get(this, 'activeDescendant');
+  sync () {
+    let activeDescendant = get(this, 'activeDescendant');
     set(this, 'value', activeDescendant ? activeDescendant.$().html() : null);
   }
 
 });
-
-export default SelectMenuLabel;

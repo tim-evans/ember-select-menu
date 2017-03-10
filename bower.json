@@ -1,20 +1,9 @@
 {
   "name": "ember-select-menu",
   "dependencies": {
-    "handlebars": "2.0.0",
-    "jquery": "^1.11.1",
-    "ember": "components/ember#canary",
-    "ember-resolver": "~0.1.11",
-    "loader.js": "ember-cli/loader.js#1.0.1",
-    "ember-cli-shims": "ember-cli/ember-cli-shims#0.0.3",
-    "ember-cli-test-loader": "ember-cli/ember-cli-test-loader#0.1.0",
-    "ember-load-initializers": "ember-cli/ember-load-initializers#0.0.2",
-    "ember-qunit": "0.1.8",
-    "ember-qunit-notifications": "0.0.5",
-    "qunit": "~1.17.1",
-    "dom-ruler": "0.1.3"
-  },
-  "resolutions": {
-    "ember": "canary"
+    "ember": "~2.6.0",
+    "ember-cli-shims": "0.1.1",
+    "ember-cli-test-loader": "0.2.2",
+    "ember-qunit-notifications": "0.1.0"
   }
 }

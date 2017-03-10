@@ -2,7 +2,7 @@ import Ember from "ember";
 
 export default Ember.Route.extend({
 
-  model: function (params) {
+  model(params) {
     return [{
       id: "choc-chip",
       disabled: params.disabled === "choc-chip",

@@ -1,17 +1,21 @@
 import Ember from "ember";
 
-var get = Ember.get;
+const { get, computed } = Ember;
 
-export default Ember.ArrayController.extend({
+export default Ember.Controller.extend({
   queryParams: ['prompt', 'disabled', 'blockStyle'],
   prompt: null,
   disabled: null,
   blockStyle: false,
-  isDisabled: function () {
-    return get(this, 'disabled') === 'true';
-  }.property('disabled'),
+  isDisabled: computed('disabled', {
+    get() {
+      return get(this, 'disabled') === 'true';
+    }
+  }),
 
-  alphabet: function () {
-    return 'abcdefghijklmnopqrstuvwxyz'.split('');
-  }.property()
+  alphabet: computed({
+    get() {
+      return 'abcdefghijklmnopqrstuvwxyz'.split('');
+    }
+  })
 });

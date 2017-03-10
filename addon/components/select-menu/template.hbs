@@ -1,0 +1,6 @@
+{{select-menu/label menu=this oninit=(action (mut label))}}
+{{#pop-over flow="dropdown" disabled=disabled ondidinsert=(action (mut popover))}}
+  {{#select-menu/list menu=this popover=popover}}
+    {{yield (hash option=(component 'select-menu/option' popover=popover onselect=(action 'select')))}}
+  {{/select-menu/list}}
+{{/pop-over}}

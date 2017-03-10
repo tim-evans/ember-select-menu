@@ -1,5 +1,4 @@
-'use strict';
-
+/* global node: true */
 module.exports = {
   name: 'ember-select-menu',
 

@@ -1,7 +1,4 @@
 import Ember from "ember";
-import SelectMenuLabel from "../views/select-menu-label";
-import nearestChild from "ember-popup-menu/computed/nearest-child";
-import w from "ember-popup-menu/computed/w";
 import { getLayout } from "dom-ruler";
 
 var get = Ember.get;
@@ -20,53 +17,36 @@ var RSVP = Ember.RSVP;
 var $ = Ember.$;
 
 // Key code mappings
-var ESC              = 27,
-    UP               = 38,
-    DOWN             = 40,
-    BACKSPACE        = 8,
-    TAB              = 9,
-    ENTER            = 13,
-    SHIFT            = 16,
-    CTRL             = 17,
-    ALT              = 18,
-    CAPS_LOCK        = 20,
-    PAGE_DOWN        = 33,
-    PAGE_UP          = 34,
-    END              = 35,
-    INSERT           = 36,
-    DELETE           = 46,
-    LEFT_WINDOW_KEY  = 91,
-    RIGHT_WINDOW_KEY = 92,
-    SELECT_KEY       = 93,
-    NUM_LOCK         = 144,
-    SCROLL_LOCK      = 145;
+const ESC              = 27,
+      UP               = 38,
+      DOWN             = 40,
+      BACKSPACE        = 8,
+      TAB              = 9,
+      ENTER            = 13,
+      SHIFT            = 16,
+      CTRL             = 17,
+      ALT              = 18,
+      CAPS_LOCK        = 20,
+      PAGE_DOWN        = 33,
+      PAGE_UP          = 34,
+      END              = 35,
+      INSERT           = 36,
+      DELETE           = 46,
+      LEFT_WINDOW_KEY  = 91,
+      RIGHT_WINDOW_KEY = 92,
+      SELECT_KEY       = 93,
+      NUM_LOCK         = 144,
+      SCROLL_LOCK      = 145;
 
-
-var SelectMenu = Ember.Component.extend({
-
-  init: function () {
-    if (get(this, 'elementId') !== guidFor(this)) {
-      set(this, 'inheritedId', get(this, 'elementId'));
-      set(this, 'elementId', guidFor(this));
-    }
-
-    this._super();
-  },
-
-  createChildView: function (childView, options) {
-    if (SelectMenuLabel.detect(childView)) {
-      options.elementId = get(this, 'inheritedId');
-    }
-    return this._super(childView, options);
-  },
+export default Ember.Component.extend({
 
   classNames: ['select-menu'],
 
   disabled: false,
 
-  options: function () {
+  options: Ember.computed(function () {
     return [];
-  }.property(),
+  }),
 
   activeOptions: filterBy('options', 'disabled', false),
 
@@ -78,17 +58,13 @@ var SelectMenu = Ember.Component.extend({
 
   prompt: null,
 
-  label: nearestChild('select-menu-label'),
-  list: nearestChild('select-menu-list'),
-  popup: nearestChild('popup-menu'),
-
-  addTarget: function () {
+  addTarget: Ember.on('didInsertElement', function () {
     next(this, function () {
       get(this, 'popup').addTarget(get(this, 'label'), {
         on: "click hold"
       });
     });
-  }.on('didInsertElement'),
+  }),
 
   /**
     The item of the content that is currently selected.
@@ -101,11 +77,11 @@ var SelectMenu = Ember.Component.extend({
     @type Object
     @default null
    */
-  value: function (key, value) {
+  value: Ember.computed(function (key, value) {
     cancel(this._value$timer);
 
     if (value && value.then) {
-      var menu = this;
+      let menu = this;
       RSVP.Promise.cast(value).then(function (unwrappedValue) {
         if (menu.isDestroyed) { return; }
         set(menu, 'value', unwrappedValue);
@@ -113,7 +89,7 @@ var SelectMenu = Ember.Component.extend({
     } else if (value == null) {
       this._value$timer = next(this, function () {
         if (this.isDestroyed || get(this, 'prompt')) { return; }
-        var firstOption = get(this, 'options.firstObject.value');
+        let firstOption = get(this, 'options.firstObject.value');
         if (firstOption && this._value$value == null) {
           set(this, 'value', firstOption);
         }
@@ -122,25 +98,25 @@ var SelectMenu = Ember.Component.extend({
 
     this._value$value = value;
     return value;
-  }.property(),
+  }),
 
 
-  _shouldShowPrompt: function () {
-    var hasPrompt = !!get(this, 'prompt');
+  _shouldShowPrompt: Ember.on('init', Ember.observer('options.[]', 'prompt', function () {
+    let hasPrompt = !!get(this, 'prompt');
     if (!hasPrompt && get(this, 'value') == null) {
       this.notifyPropertyChange('value');
     }
-  }.observes('options.[]', 'prompt').on('init'),
+  })),
 
   /**
     Interpret keyboard events
    */
-  keyDown: function (evt) {
-    var code = (evt.keyCode ? evt.keyCode : evt.which);
-    var search = get(this, 'searchString');
-    var label = get(this, 'label');
-    var popup = get(this, 'popup');
-    var isActive = get(this, 'isActive');
+  keyDown(evt) {
+    let code = (evt.keyCode ? evt.keyCode : evt.which);
+    let search = get(this, 'searchString');
+    let label = get(this, 'label');
+    let popup = get(this, 'popup');
+    let isActive = get(this, 'isActive');
 
     // If the meta key was held, don't do anything.
     if (evt.metaKey) {
@@ -206,7 +182,7 @@ var SelectMenu = Ember.Component.extend({
 
       break;
     default:
-      var chr = String.fromCharCode(code);
+      let chr = String.fromCharCode(code);
 
       // Append
       if (search) {
@@ -231,10 +207,10 @@ var SelectMenu = Ember.Component.extend({
   /**
     Selects the next item in the option list.
    */
-  selectNext: function () {
-    var options = get(this, 'activeOptions');
-    var activeDescendant = get(this, 'activeDescendant');
-    var index;
+  selectNext() {
+    let options = get(this, 'activeOptions');
+    let activeDescendant = get(this, 'activeDescendant');
+    let index;
 
     if (options) {
       if (activeDescendant) {
@@ -243,7 +219,7 @@ var SelectMenu = Ember.Component.extend({
         index = -1;
       }
 
-      var option = options.objectAt(Math.min(index + 1, get(options, 'length') - 1));
+      let option = options.objectAt(Math.min(index + 1, get(options, 'length') - 1));
       if (option !== activeDescendant) {
         set(this, 'activeDescendant', option);
         set(this, 'value', get(option, 'value'));
@@ -254,10 +230,10 @@ var SelectMenu = Ember.Component.extend({
   /**
     Selects the previous item in the option list.
    */
-  selectPrevious: function () {
-    var options = get(this, 'activeOptions');
-    var activeDescendant = get(this, 'activeDescendant');
-    var index;
+  selectPrevious() {
+    let options = get(this, 'activeOptions');
+    let activeDescendant = get(this, 'activeDescendant');
+    let index;
 
     if (options) {
       if (activeDescendant) {
@@ -266,7 +242,7 @@ var SelectMenu = Ember.Component.extend({
         index = get(options, 'length');
       }
 
-      var option = options.objectAt(Math.max(index - 1, 0));
+      let option = options.objectAt(Math.max(index - 1, 0));
       if (option !== activeDescendant) {
         set(this, 'activeDescendant', option);
         set(this, 'value', get(option, 'value'));
@@ -278,24 +254,31 @@ var SelectMenu = Ember.Component.extend({
     Search by value of the object
    */
   "search-by": alias('searchBy'),
-  searchBy: w("label"),
+  searchBy: Ember.computed({
+    get() {
+      return ['label'];
+    },
+    set(_, value) {
+      return value.split(' ');
+    }
+  }),
 
   /**
     Locally iterate through options and find the
     best match. After 750 milliseconds of inactivity,
     the search is reset, allowing users to search again.
    */
-  searchStringDidChange: function () {
+  searchStringDidChange: Ember.observer('searchString', function () {
     if (this.__timer) {
       cancel(this.__timer);
     }
 
-    var options = get(this, 'activeOptions');
-    var search = get(this, 'searchString');
-    var searchBy = get(this, 'searchBy');
+    let options = get(this, 'activeOptions');
+    let search = get(this, 'searchString');
+    let searchBy = get(this, 'searchBy');
 
     if (options && search && searchBy) {
-      var length = get(options, 'length'),
+      let length = get(options, 'length'),
           match = null,
           start,
           matchIndex;
@@ -310,8 +293,8 @@ var SelectMenu = Ember.Component.extend({
         start = 0;
       }
 
-      var hasMatch = function (option) {
-        for (var i = 0; i < searchBy.length; i++) {
+      let hasMatch = function (option) {
+        for (let i = 0; i < searchBy.length; i++) {
           if (String(get(option, searchBy[i]) || '').toUpperCase().indexOf(search) === 0) {
             return true;
           }
@@ -321,8 +304,8 @@ var SelectMenu = Ember.Component.extend({
 
       // Search from the current value
       // for the next match
-      for (var i = start; i < length; i++) {
-        var option = options.objectAt(i);
+      for (let i = start; i < length; i++) {
+        let option = options.objectAt(i);
         match = hasMatch(option);
 
         // Break on the first match,
@@ -349,30 +332,30 @@ var SelectMenu = Ember.Component.extend({
     if (search) {
       this.__timer = later(this, this.resetSearch, 750);
     }
-  }.observes('searchString'),
+  }),
 
   /**
     Reset the `searchString`.
    */
-  resetSearch: function () {
+  resetSearch() {
     this.__timer = null;
     this.__matchIndex = null;
     set(this, 'searchString', null);
   },
 
-  scrollActiveDescendantIntoView: function () {
-    var activeDescendant = get(this, 'activeDescendant');
+  scrollActiveDescendantIntoView: Ember.on('init', Ember.observer('activeDescendant', function () {
+    let activeDescendant = get(this, 'activeDescendant');
 
     if (activeDescendant && get(this, 'isActive') && get(this, 'list')) {
-      var list = get(this, 'list');
-      var listBox = getLayout(get(this, 'list.element'));
-      var height = getLayout(get(this, 'popup.element')).padding.height;
-      var option = get(activeDescendant, 'element');
-      var scrollTop = list.$().scrollTop();
-      var scrollBottom = scrollTop + listBox.padding.height;
+      let list = get(this, 'list');
+      let listBox = getLayout(get(this, 'list.element'));
+      let height = getLayout(get(this, 'popup.element')).padding.height;
+      let option = get(activeDescendant, 'element');
+      let scrollTop = list.$().scrollTop();
+      let scrollBottom = scrollTop + listBox.padding.height;
 
-      var optionTop = scrollTop + $(option).position().top;
-      var optionBottom = optionTop + getLayout(option).margins.height;
+      let optionTop = scrollTop + $(option).position().top;
+      let optionBottom = optionTop + getLayout(option).margins.height;
 
       if (optionTop < scrollTop) {
         list.$().scrollTop(optionTop - listBox.padding.top);
@@ -380,8 +363,12 @@ var SelectMenu = Ember.Component.extend({
         list.$().scrollTop(optionBottom - height + listBox.padding.bottom);
       }
     }
-  }.observes('activeDescendant').on('init')
+  })),
+
+  actions: {
+    select(option) {
+      get(this, 'onchange')(get(option, 'value'));
+    }
+  }
 
 });
-
-export default SelectMenu;

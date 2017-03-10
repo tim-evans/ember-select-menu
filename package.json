@@ -8,32 +8,37 @@
   "scripts": {
     "start": "ember server",
     "build": "ember build",
-    "test": "ember test"
+    "test": "ember try:each"
   },
-  "repository": "https://github.com/paddle8/ember-select-menu",
+  "repository": "https://github.com/tim-evans/ember-select-menu",
   "engines": {
     "node": ">= 0.10.0"
   },
-  "author": "Tim Evans <tim.evans@paddle8.com>",
+  "author": "Tim Evans <tim.c.evans@me.com>",
   "license": "MIT",
   "devDependencies": {
-    "broccoli-asset-rev": "^2.0.0",
-    "ember-cli": "0.1.11",
-    "ember-cli-6to5": "^3.0.0",
-    "ember-cli-app-version": "0.3.0",
-    "ember-cli-content-security-policy": "0.3.0",
-    "ember-cli-dependency-checker": "0.0.7",
-    "ember-cli-htmlbars": "^0.6.0",
-    "ember-cli-ic-ajax": "0.1.1",
-    "ember-cli-inject-live-reload": "^1.3.0",
-    "ember-cli-qunit": "0.3.1",
-    "ember-cli-uglify": "1.0.1",
-    "ember-export-application-global": "^1.0.0",
-    "express": "^4.8.5",
-    "glob": "^4.0.5"
+    "broccoli-asset-rev": "^2.4.2",
+    "ember-cli": "2.6.2",
+    "ember-cli-app-version": "^1.0.0",
+    "ember-cli-dependency-checker": "^1.2.0",
+    "ember-cli-eslint": "1.6.0",
+    "ember-cli-htmlbars-inline-precompile": "^0.3.1",
+    "ember-cli-inject-live-reload": "^1.4.0",
+    "ember-cli-qunit": "^2.0.0",
+    "ember-cli-release": "0.2.9",
+    "ember-cli-sass": "5.3.1",
+    "ember-cli-uglify": "^1.2.0",
+    "ember-disable-prototype-extensions": "^1.1.0",
+    "ember-load-initializers": "0.5.1",
+    "ember-resolver": "^2.0.3",
+    "ember-watson": "0.8.5",
+    "liquid-fire": "0.26.3",
+    "loader.js": "^4.0.1"
   },
   "dependencies": {
-    "ember-popup-menu": "^0.1.15"
+    "ember-cli-babel": "^5.1.6",
+    "ember-cli-htmlbars": "^1.0.3",
+    "ember-pop-over": "^0.4.4"
   },
   "keywords": [
     "ember-addon"

@@ -1,2 +1,1 @@
-import SelectMenu from "ember-select-menu/components/select-menu";
-export default SelectMenu;
+export { default } from "ember-select-menu/components/select-menu/component";
