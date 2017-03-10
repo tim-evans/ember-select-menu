@@ -3,12 +3,7 @@ import RSVP from 'rsvp';
 import layout from './template';
 import { getLayout } from "dom-ruler";
 
-var get = Ember.get;
-var cancel = Ember.run.cancel;
-var later = Ember.run.later;
-var set = Ember.set;
-
-var alias = Ember.computed.alias;
+const { get, set, run: { cancel, later }, computed: { reads } } = Ember;
 
 // Key code mappings
 const ESC              = 27,
@@ -43,7 +38,8 @@ export default Ember.Component.extend({
   options: null,
 
   query: null,
-  isExpanded: alias('popover.isActive'),
+
+  isExpanded: reads('popover.isActive'),
 
   /**
     The item of the content that is currently selected.
@@ -198,10 +194,10 @@ export default Ember.Component.extend({
    */
   'search-by': Ember.computed({
     get() {
-      return ['label'];
+      return [];
     },
     set(_, value) {
-      return value.split(' ');
+      return (value || '').split(' ');
     }
   }),
 
@@ -211,13 +207,15 @@ export default Ember.Component.extend({
     the search is reset, allowing users to search again.
    */
   search(query) {
+    set(this, 'query', query);
+
     if (this.__timer) {
       cancel(this.__timer);
     }
 
     let options = get(this, 'options');
-    let searchBy = get(this, 'searchBy');
-    set(this, 'query', query);
+    let searchBy = get(this, 'search-by');
+    let searchIndex = get(this, 'searchIndex');
 
     if (options && query && searchBy) {
       let length = get(options, 'length'),
@@ -235,7 +233,10 @@ export default Ember.Component.extend({
         start = 0;
       }
 
-      let hasMatch = function (option) {
+      let hasMatch = function (option, text) {
+        if (text.indexOf(query) === 0) {
+          return true;
+        }
         for (let i = 0; i < searchBy.length; i++) {
           if (String(get(option, searchBy[i]) || '').toUpperCase().indexOf(query) === 0) {
             return true;
@@ -248,7 +249,8 @@ export default Ember.Component.extend({
       // for the next match
       for (let i = start; i < length; i++) {
         let option = Ember.A(options).objectAt(i);
-        match = hasMatch(option);
+        let text = searchIndex.objectAt(i);
+        match = hasMatch(option, text);
 
         // Break on the first match,
         // if a user would like to match
@@ -281,12 +283,19 @@ export default Ember.Component.extend({
   resetSearch() {
     this.__timer = null;
     this.__matchIndex = null;
+    set(this, 'query', null);
   },
 
   didReceiveAttrs() {
     if (get(this, 'value')) {
-      let index = get(this, 'options').indexOf(get(this, 'value'));
-      set(this, 'activeDescendantId', `select-menu_option_${get(this, 'elementId')}_${index}`);
+      RSVP.hash({
+        options: get(this, 'options'),
+        value: get(this, 'value')
+      }).then(({ options, value }) => {
+        let index = options.indexOf(value);
+        set(this, 'unwrappedValue', value);
+        set(this, 'activeDescendantId', `select-menu_option_${get(this, 'elementId')}_${index}`);
+      });
     } else {
       set(this, 'activeDescendantId', null);
     }
@@ -310,17 +319,26 @@ export default Ember.Component.extend({
         $list.scrollTop(optionBottom - listBox.padding.height + listBox.padding.bottom);
       }
     }
+
+    if (get(this, 'isExpanded') && get(this, 'searchIndex') == null) {
+      let $options = this.$('ul li');
+      set(this, 'searchIndex', Ember.A($options.map(function () {
+        return this.innerHTML.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '').toUpperCase();
+      }).toArray()));
+    }
   },
 
   actions: {
     updatePrompt(hasPrompt) {
       set(this, 'hasPrompt', hasPrompt);
       if (!hasPrompt) {
-        RSVP.resolve(get(this, 'options')).then((options) => {
-          return RSVP.resolve(get(Ember.A(options || []), 'firstObject'));
-        }).then((option) => {
-          if (this.isDestroyed && get(this, 'value') != null) { return; }
-          get(this, 'onchange')(option);
+        RSVP.hash({
+          options: get(this, 'options'),
+          value: get(this, 'value')
+        }).then(({ value, options }) => {
+          let firstOption = get(Ember.A(options || []), 'firstObject');
+          if (this.isDestroyed && value != null) { return; }
+          get(this, 'onchange')(firstOption);
         });
       }
     }

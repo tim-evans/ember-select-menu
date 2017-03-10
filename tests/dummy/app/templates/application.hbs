@@ -1,11 +1,6 @@
-<label for="favorite-cookie">What's your favorite cookie?</label>
-{{#select-menu id="favorite-cookie" options=model value=favoriteCookie onchange=(action (mut favoriteCookie)) as |option|}}
+<label for="country">Country</label>
+{{#select-menu id="country" options=model value=country onchange=(action (mut country)) as |option|}}
   {{option.name}}
 {{else}}
-  Pick a cookie
-{{/select-menu}}
-<div id="favorite">{{favoriteCookie.name}}</div>
-
-{{#select-menu id="alphabet" options=alphabet value=character onchange=(action (mut character)) as |option|}}
-  {{option}}
+  Select the country...
 {{/select-menu}}

@@ -5,13 +5,13 @@
   disabled=disabled
   expanded=isExpanded
   oninit=(action 'updatePrompt' (hasBlock 'inverse'))
-  activeDescendant=activeDescendantId}}
-  {{#if value}}
-    {{yield value}}
-  {{else if (hasBlock 'inverse')}}
+  activeDescendant=activeDescendantId~}}
+  {{#if value~}}
+    {{yield unwrappedValue}}
+  {{~else if (hasBlock 'inverse')~}}
     {{yield to='inverse'}}
-  {{/if}}
-{{/select-menu/label}}
+  {{~/if}}
+{{~/select-menu/label~}}
 
 {{#pop-over
   for=(concat 'select-menu_label_' elementId)
@@ -20,17 +20,17 @@
   disabled=disabled
   ondidinsert=(action (mut popover))
   onshow=(action (mut isExpanded) true)
-  onhide=(action (mut isExpanded) false)}}
+  onhide=(action (mut isExpanded) false)~}}
   {{#select-menu/list
     id=(concat 'select-menu_list_' elementId)
     disabled=disabled
     isExpanded=isExpanded
     aria-labelledby=(concat 'select-menu_label_' elementId)
-    aria-activedescendant=activeDescendantId}}
-    {{#each options as |option idx|}}
-      {{#select-menu/option id=(concat 'select-menu_option_' elementId '_' idx) value=option selection=value onselect=(action onchange option)}}
+    aria-activedescendant=activeDescendantId~}}
+    {{~#each options as |option idx|~}}
+      {{#select-menu/option id=(concat 'select-menu_option_' elementId '_' idx) value=option selection=value onselect=(action onchange option)~}}
         {{yield option}}
-      {{/select-menu/option}}
-    {{/each}}
-  {{/select-menu/list}}
-{{/pop-over}}
+      {{~/select-menu/option}}
+    {{~/each}}
+  {{~/select-menu/list}}
+{{~/pop-over~}}

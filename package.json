@@ -40,6 +40,7 @@
   "dependencies": {
     "ember-cli-babel": "^5.1.7",
     "ember-cli-htmlbars": "^1.1.1",
+    "ember-native-dom-helpers": "^0.3.2",
     "ember-pop-over": "^0.4.4"
   },
   "keywords": [

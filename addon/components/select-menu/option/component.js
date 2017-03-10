@@ -28,7 +28,7 @@ export default Ember.Component.extend({
   }),
 
   didRender() {
-    let label = this.$().html().replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    let label = get(this, 'element').innerHTML.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
     if (get(this, 'aria-label') !== label) {
       set(this, 'aria-label', label);
     }
