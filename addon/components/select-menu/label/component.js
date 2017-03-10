@@ -3,7 +3,7 @@ import $ from 'jquery';
 import stringify from '../../../computed/stringify';
 import layout from './template';
 
-const { get, set, observer, init, computed, computed: { reads, not }, run: { bind, scheduleOnce } } = Ember;
+const { get, set, computed: { not }, run: { bind } } = Ember;
 
 export default Ember.Component.extend({
 
@@ -20,17 +20,14 @@ export default Ember.Component.extend({
                       'tabindex'],
 
   classNameBindings: ['isPrompting:is-prompting',
-                      'menu.isActive:active',
+                      'expanded:expanded',
                       'isHovering:hover',
-                      'menu.disabled:disabled'],
-
-  prompt: reads('menu.prompt'),
+                      'disabled:disabled'],
 
   ariaRole: 'button',
   "aria-haspopup": 'true',
-  "aria-owns": reads('menu.list.elementId'),
-  "aria-disabled": stringify('menu.disabled'),
-  "aria-expanded": stringify("menu.isActive"),
+  "aria-disabled": stringify('disabled'),
+  "aria-expanded": stringify('expanded'),
 
   tabindex: 0,
 
@@ -44,7 +41,7 @@ export default Ember.Component.extend({
     select menu.
    */
   didInsertElement() {
-    let selector = `label[for="${get(this, 'elementId')}"]`;
+    let selector = `label[for="${get(this, 'for')}"]`;
     let eventManager = this._eventManager = {
       mouseenter: bind(this, 'set', 'isHovering', true),
       mouseleave: bind(this, 'set', 'isHovering', false)
@@ -71,16 +68,6 @@ export default Ember.Component.extend({
     set(this, 'isHovering', false);
   },
 
-  activeDescendant: reads('menu.activeDescendant'),
-  isPrompting: not('activeDescendant'),
-
-  activeDescendantDidChange: observer('activeDescendant', on('init', function () {
-    scheduleOnce('afterRender', this, 'sync');
-  })),
-
-  sync () {
-    let activeDescendant = get(this, 'activeDescendant');
-    set(this, 'value', activeDescendant ? activeDescendant.$().html() : null);
-  }
+  isPrompting: not('activeDescendant')
 
 });

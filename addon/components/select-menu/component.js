@@ -1,20 +1,14 @@
-import Ember from "ember";
+import Ember from 'ember';
+import RSVP from 'rsvp';
+import layout from './template';
 import { getLayout } from "dom-ruler";
 
 var get = Ember.get;
-var next = Ember.run.next;
 var cancel = Ember.run.cancel;
 var later = Ember.run.later;
 var set = Ember.set;
 
-var guidFor = Ember.guidFor;
-
-var filterBy = Ember.computed.filterBy;
-var reads = Ember.computed.reads;
 var alias = Ember.computed.alias;
-
-var RSVP = Ember.RSVP;
-var $ = Ember.$;
 
 // Key code mappings
 const ESC              = 27,
@@ -40,23 +34,16 @@ const ESC              = 27,
 
 export default Ember.Component.extend({
 
+  layout,
+
   classNames: ['select-menu'],
 
   disabled: false,
 
-  options: Ember.computed(function () {
-    return [];
-  }),
-
-  activeOptions: filterBy('options', 'disabled', false),
-
-  activeDescendants: filterBy('options', 'selected'),
-  activeDescendant: reads('activeDescendants.firstObject'),
+  options: null,
 
   query: null,
-  isActive: alias('popup.isActive'),
-
-  prompt: null,
+  isExpanded: alias('popover.isActive'),
 
   /**
     The item of the content that is currently selected.
@@ -69,36 +56,7 @@ export default Ember.Component.extend({
     @type Object
     @default null
    */
-  value: Ember.computed(function (key, value) {
-    cancel(this._value$timer);
-
-    if (value && value.then) {
-      let menu = this;
-      RSVP.Promise.cast(value).then(function (unwrappedValue) {
-        if (menu.isDestroyed) { return; }
-        set(menu, 'value', unwrappedValue);
-      });
-    } else if (value == null) {
-      this._value$timer = next(this, function () {
-        if (this.isDestroyed || get(this, 'prompt')) { return; }
-        let firstOption = get(this, 'options.firstObject.value');
-        if (firstOption && this._value$value == null) {
-          set(this, 'value', firstOption);
-        }
-      });
-    }
-
-    this._value$value = value;
-    return value;
-  }),
-
-
-  _shouldShowPrompt: Ember.on('init', Ember.observer('options.[]', 'prompt', function () {
-    let hasPrompt = !!get(this, 'prompt');
-    if (!hasPrompt && get(this, 'value') == null) {
-      this.notifyPropertyChange('value');
-    }
-  })),
+  value: null,
 
   /**
     Interpret keyboard events
@@ -106,9 +64,8 @@ export default Ember.Component.extend({
   keyDown(evt) {
     let code = evt.keyCode ? evt.keyCode : evt.which;
     let query = get(this, 'query');
-    let label = get(this, 'label');
     let popover = get(this, 'popover');
-    let isActive = get(this, 'isActive');
+    let isExpanded = get(this, 'isExpanded');
 
     // If the meta key was held, don't do anything.
     if (evt.metaKey) {
@@ -124,17 +81,17 @@ export default Ember.Component.extend({
 
     switch (code) {
     case UP:
-      if (isActive) {
+      if (isExpanded) {
         this.selectPrevious();
       }
-      popover.activate(label);
+      popover.show();
 
       break;
     case DOWN:
-      if (isActive) {
+      if (isExpanded) {
         this.selectNext();
       }
-      popover.activate(label);
+      popover.show();
 
       break;
     case ESC:
@@ -181,13 +138,13 @@ export default Ember.Component.extend({
         this.search(query + chr);
       } else {
         if (chr === ' ') {
-          if (isActive) {
+          if (isExpanded) {
             popover.hide();
           } else {
-            popover.activate(label);
+            popover.show();
           }
         } else {
-          popover.activate(label);
+          popover.show();
           this.search(chr);
         }
       }
@@ -200,22 +157,19 @@ export default Ember.Component.extend({
     Selects the next item in the option list.
    */
   selectNext() {
-    let options = get(this, 'activeOptions');
-    let activeDescendant = get(this, 'activeDescendant');
+    let options = get(this, 'options');
+    let value = get(this, 'value');
     let index;
 
     if (options) {
-      if (activeDescendant) {
-        index = options.indexOf(activeDescendant);
+      if (value) {
+        index = options.indexOf(value);
       } else {
         index = -1;
       }
 
-      let option = options.objectAt(Math.min(index + 1, get(options, 'length') - 1));
-      if (option !== activeDescendant) {
-        set(this, 'activeDescendant', option);
-        get(this, 'onchange')(get(option, 'value'));
-      }
+      let option = Ember.A(options).objectAt(Math.min(index + 1, get(options, 'length') - 1));
+      get(this, 'onchange')(option);
     }
   },
 
@@ -223,30 +177,26 @@ export default Ember.Component.extend({
     Selects the previous item in the option list.
    */
   selectPrevious() {
-    let options = get(this, 'activeOptions');
-    let activeDescendant = get(this, 'activeDescendant');
+    let options = get(this, 'options');
+    let value = get(this, 'value');
     let index;
 
     if (options) {
-      if (activeDescendant) {
-        index = options.indexOf(activeDescendant);
+      if (value) {
+        index = options.indexOf(value);
       } else {
         index = get(options, 'length');
       }
 
-      let option = options.objectAt(Math.max(index - 1, 0));
-      if (option !== activeDescendant) {
-        set(this, 'activeDescendant', option);
-        set(this, 'value', get(option, 'value'));
-      }
+      let option = Ember.A(options).objectAt(Math.max(index - 1, 0));
+      get(this, 'onchange')(option);
     }
   },
 
   /**
     Search by value of the object
    */
-  "search-by": alias('searchBy'),
-  searchBy: Ember.computed({
+  'search-by': Ember.computed({
     get() {
       return ['label'];
     },
@@ -265,7 +215,7 @@ export default Ember.Component.extend({
       cancel(this.__timer);
     }
 
-    let options = get(this, 'activeOptions');
+    let options = get(this, 'options');
     let searchBy = get(this, 'searchBy');
     set(this, 'query', query);
 
@@ -297,7 +247,7 @@ export default Ember.Component.extend({
       // Search from the current value
       // for the next match
       for (let i = start; i < length; i++) {
-        let option = options.objectAt(i);
+        let option = Ember.A(options).objectAt(i);
         match = hasMatch(option);
 
         // Break on the first match,
@@ -315,8 +265,7 @@ export default Ember.Component.extend({
       // so we can continue searching from that
       // index on consective searches
       if (match != null) {
-        set(this, 'activeDescendant', match);
-        get(this, 'onchange')(get(match, 'value'));
+        get(this, 'onchange')(match);
         this.__matchIndex = matchIndex;
       }
     }
@@ -334,39 +283,47 @@ export default Ember.Component.extend({
     this.__matchIndex = null;
   },
 
-  scrollActiveDescendantIntoView: Ember.on('init', Ember.observer('activeDescendant', function () {
-    let activeDescendant = get(this, 'activeDescendant');
+  didReceiveAttrs() {
+    if (get(this, 'value')) {
+      let index = get(this, 'options').indexOf(get(this, 'value'));
+      set(this, 'activeDescendantId', `select-menu_option_${get(this, 'elementId')}_${index}`);
+    } else {
+      set(this, 'activeDescendantId', null);
+    }
+  },
 
-    if (activeDescendant && get(this, 'isActive') && get(this, 'list')) {
-      let list = get(this, 'list');
-      let listBox = getLayout(get(this, 'list.element'));
-      let height = getLayout(get(this, 'popover.element')).padding.height;
-      let option = get(activeDescendant, 'element');
-      let scrollTop = list.$().scrollTop();
+  didRender() {
+    // Scroll to the active descendant
+    if (get(this, 'isExpanded') && get(this, 'activeDescendantId')) {
+      let $list = this.$(`#select-menu_list_${get(this, 'elementId')}`);
+      let listBox = getLayout($list[0]);
+      let $option = this.$(`#${get(this, 'activeDescendantId')}`);
+      let scrollTop = $list.scrollTop();
       let scrollBottom = scrollTop + listBox.padding.height;
 
-      let optionTop = scrollTop + $(option).position().top;
-      let optionBottom = optionTop + getLayout(option).margins.height;
+      let optionTop = scrollTop + $option.position().top;
+      let optionBottom = optionTop + getLayout($option[0]).margins.height;
 
       if (optionTop < scrollTop) {
-        list.$().scrollTop(optionTop - listBox.padding.top);
+        $list.scrollTop(optionTop - listBox.padding.top);
       } else if (optionBottom > scrollBottom) {
-        list.$().scrollTop(optionBottom - height + listBox.padding.bottom);
+        $list.scrollTop(optionBottom - listBox.padding.height + listBox.padding.bottom);
       }
     }
-  })),
+  },
 
   actions: {
-    select(option) {
-      get(this, 'onchange')(get(option, 'value'));
-    },
-
-    setPopover(popover) {
-      popover.addTarget(get(this, 'label'), {
-        on: "click hold"
-      });
-      set(this, 'popover', popover);
-    },
+    updatePrompt(hasPrompt) {
+      set(this, 'hasPrompt', hasPrompt);
+      if (!hasPrompt) {
+        RSVP.resolve(get(this, 'options')).then((options) => {
+          return RSVP.resolve(get(Ember.A(options || []), 'firstObject'));
+        }).then((option) => {
+          if (this.isDestroyed && get(this, 'value') != null) { return; }
+          get(this, 'onchange')(option);
+        });
+      }
+    }
   }
 
 });

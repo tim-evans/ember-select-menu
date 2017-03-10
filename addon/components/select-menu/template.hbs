@@ -1,6 +1,36 @@
-{{select-menu/label menu=this oninit=(action (mut label))}}
-{{#pop-over flow="dropdown" disabled=disabled ondidinsert=(action 'setPopover')}}
-  {{#select-menu/list menu=this popover=popover}}
-    {{yield (hash option=(component 'select-menu/option' popover=popover onselect=(action 'select')))}}
+{{#select-menu/label
+  id=(concat 'select-menu_label_' elementId)
+  for=elementId
+  aria-owns=(concat 'select-menu_list_' elementId)
+  disabled=disabled
+  expanded=isExpanded
+  oninit=(action 'updatePrompt' (hasBlock 'inverse'))
+  activeDescendant=activeDescendantId}}
+  {{#if value}}
+    {{yield value}}
+  {{else if (hasBlock 'inverse')}}
+    {{yield to='inverse'}}
+  {{/if}}
+{{/select-menu/label}}
+
+{{#pop-over
+  for=(concat 'select-menu_label_' elementId)
+  on='click hold'
+  flow="dropdown"
+  disabled=disabled
+  ondidinsert=(action (mut popover))
+  onshow=(action (mut isExpanded) true)
+  onhide=(action (mut isExpanded) false)}}
+  {{#select-menu/list
+    id=(concat 'select-menu_list_' elementId)
+    disabled=disabled
+    isExpanded=isExpanded
+    aria-labelledby=(concat 'select-menu_label_' elementId)
+    aria-activedescendant=activeDescendantId}}
+    {{#each options as |option idx|}}
+      {{#select-menu/option id=(concat 'select-menu_option_' elementId '_' idx) value=option selection=value onselect=(action onchange option)}}
+        {{yield option}}
+      {{/select-menu/option}}
+    {{/each}}
   {{/select-menu/list}}
 {{/pop-over}}

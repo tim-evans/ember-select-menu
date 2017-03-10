@@ -16,27 +16,23 @@ export default Ember.Component.extend({
   ariaRole: 'option',
   'aria-selected': stringify('selected'),
   'aria-disabled': stringify('disabled'),
-  'aria-label': reads('label'),
+  'aria-label': null,
 
   label: null,
   disabled: false,
-
-  didInsertElement() {
-    get(this, 'menu.options').unshiftObject(this);
-  },
-
-  willDestroyElement() {
-    get(this, 'menu.options').removeObject(this);
-  },
-
-  activeDescendant: reads('menu.activeDescendant'),
-  selection: reads('menu.value'),
 
   selected: computed('selection', 'value', {
     get() {
       return isEqual(get(this, 'selection'), get(this, 'value'));
     }
   }),
+
+  didRender() {
+    let label = this.$().html().replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+    if (get(this, 'aria-label') !== label) {
+      set(this, 'aria-label', label);
+    }
+  },
 
   click() {
     if (get(this, 'disabled')) { return; }

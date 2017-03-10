@@ -3,15 +3,15 @@ html, body {
 }
 
 .select-menu_label {
-  position: relative;
+  transition: all 120ms;
   display: block;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
   cursor: pointer;
 
-  color: #333;
-  background-color: #F2F2F2;
+  color: #FFF;
+  background-color: #050505;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -20,6 +20,7 @@ html, body {
   padding: 0 30px 0 10px;
   line-height: 42px;
   outline: none;
+  margin-bottom: 10px;
 }
 
 .select-menu_label.is-prompting {
@@ -29,15 +30,14 @@ html, body {
 .select-menu_label:hover,
 .select-menu_label.hover,
 .select-menu_label:focus {
-  color: #333;
-  background-color: #D9D9D9;
+  background-color: #333;
   text-decoration: none;
 }
 
 .select-menu_label:active,
-.select-menu_label.active {
+.select-menu_label.expanded {
   color: #FFF;
-  background-color: #333;
+  background-color: blue;
   text-decoration: none;
 }
 
@@ -113,4 +113,12 @@ html, body {
 
 .select-group .select-option {
   padding-left: 30px;
+}
+
+.pop-over {
+  z-index: 10;
+}
+
+.pop-over-pointer {
+  border-color: transparent !important;
 }

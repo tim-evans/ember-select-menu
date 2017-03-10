@@ -1,23 +1,11 @@
 <label for="favorite-cookie">What's your favorite cookie?</label>
-{{#if blockStyle}}
-  {{#select-menu id="favorite-cookie" value=favoriteCookie prompt=prompt disabled=isDisabled as |s|}}
-    {{#each model as |it|}}
-      {{#s.option id=it.id value=it disabled=it.disabled}}
-        {{it.name}}
-      {{/s.option}}
-    {{/each}}
-  {{/select-menu}}
+{{#select-menu id="favorite-cookie" options=model value=favoriteCookie onchange=(action (mut favoriteCookie)) as |option|}}
+  {{option.name}}
 {{else}}
-  {{#select-menu id="favorite-cookie" value=favoriteCookie prompt=prompt disabled=isDisabled as |s|}}
-    {{#each model as |it|}}
-      {{s.option label=it.name id=it.id value=it disabled=it.disabled}}
-    {{/each}}
-  {{/select-menu}}
-{{/if}}
+  Pick a cookie
+{{/select-menu}}
 <div id="favorite">{{favoriteCookie.name}}</div>
 
-{{#select-menu id="alphabet" as |s|}}
-  {{#each alphabet as |it|}}
-    {{s.option id=it value=it label=it}}
-  {{/each}}
+{{#select-menu id="alphabet" options=alphabet value=character onchange=(action (mut character)) as |option|}}
+  {{option}}
 {{/select-menu}}

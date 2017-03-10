@@ -36,9 +36,7 @@ var keyDown = function (component, keyCode) {
 
 moduleForComponent('select-menu', 'SelectMenuComponent', {});
 
-test('it unwraps promises', function() {
-  expect(2);
-
+test('it unwraps promises', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
@@ -59,19 +57,15 @@ test('it unwraps promises', function() {
     set(component, 'value', deferred.promise);
   });
 
-  equal(get(component, 'value'), deferred.promise);
+  assert.equal(get(component, 'value'), deferred.promise);
   deferred.resolve("Dark Chocolate Chocolate Chip");
 
-  stop();
-  deferred.promise.then(function () {
-    equal(get(component, 'value'), "Dark Chocolate Chocolate Chip");
-    start();
+  return deferred.promise.then(function () {
+    assert.equal(get(component, 'value'), "Dark Chocolate Chocolate Chip");
   });
 });
 
-test('it selects the first option if the promise resolves to null', function() {
-  expect(2);
-
+test('it selects the first option if the promise resolves to null', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
@@ -91,27 +85,26 @@ test('it selects the first option if the promise resolves to null', function() {
 
     set(component, 'value', deferred.promise);
   });
-  equal(get(component, 'value'), deferred.promise);
+  assert.equal(get(component, 'value'), deferred.promise);
   deferred.resolve(null);
 
   stop();
-  deferred.promise.then(function () {
+  return deferred.promise.then(function () {
     var d = RSVP.defer();
     next(d, 'resolve');
     return d.promise;
   }).then(function () {
-    equal(get(component, 'value'), "Chocolate Chip Walnut");
-    start();
+    assert.equal(get(component, 'value'), "Chocolate Chip Walnut");
   });
 });
 
-test('it selects nothing if the promise resolves to null and there is a prompt', function() {
-  expect(2);
+test('it selects nothing if the promise resolves to null and there is a prompt', function (assert) {
 
   // creates the component instance
   var component = this.subject({
     popup: mock()
   });
+
   var deferred = RSVP.defer();
   run(function () {
     set(component, 'options', [{
@@ -127,29 +120,26 @@ test('it selects nothing if the promise resolves to null and there is a prompt',
     set(component, 'value', deferred.promise);
   });
 
-  equal(get(component, 'value'), deferred.promise);
+  assert.equal(get(component, 'value'), deferred.promise);
   deferred.resolve(null);
 
-  stop();
-  deferred.promise.then(function () {
+  return deferred.promise.then(function () {
     var d = RSVP.defer();
     set(component, 'prompt', "'ELLO");
     next(d, 'resolve');
     return d.promise;
   }).then(function () {
-    equal(get(component, 'value'), null);
-    start();
+    assert.equal(get(component, 'value'), null);
   });
 });
 
 
-test('it allows selection through typing', function() {
-  expect(1);
-
+test('it allows selection through typing', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
   });
+
   run(function () {
     set(component, 'searchBy', ['value']);
     set(component, 'options', [{
@@ -168,16 +158,15 @@ test('it allows selection through typing', function() {
   });
   type(component, 'Oat');
 
-  equal(get(component, 'value'), "Oatmeal Raisin Cookie");
+  assert.equal(get(component, 'value'), "Oatmeal Raisin Cookie");
 });
 
-test('it continues from the current match when searching', function() {
-  expect(2);
-
+test('it continues from the current match when searching', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
   });
+
   run(function () {
     set(component, 'searchBy', ['value']);
     set(component, 'options', [{
@@ -196,19 +185,18 @@ test('it continues from the current match when searching', function() {
   });
 
   type(component, 'Dark Chocolate ');
-  equal(get(component, 'value'), "Dark Chocolate Chocolate Chip");
+  assert.equal(get(component, 'value'), "Dark Chocolate Chocolate Chip");
   type(component, 'P');
-  equal(get(component, 'value'), "Dark Chocolate Peanut Butter Chip");
+  assert.equal(get(component, 'value'), "Dark Chocolate Peanut Butter Chip");
 });
 
 
-test('it searches case insensitively', function() {
-  expect(2);
-
+test('it searches case insensitively', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
   });
+
   run(function () {
     set(component, 'searchBy', ['value']);
     set(component, 'options', [{
@@ -227,17 +215,16 @@ test('it searches case insensitively', function() {
   });
 
   type(component, 'dARK ChOCOLATE ch');
-  ok(defaultPrevented);
-  equal(get(component, 'value'), "Dark Chocolate Chocolate Chip");
+  assert.ok(defaultPrevented);
+  assert.equal(get(component, 'value'), "Dark Chocolate Chocolate Chip");
 });
 
-test('it handles backspaces', function() {
-  expect(2);
-
+test('it handles backspaces', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
   });
+
   run(function () {
     set(component, 'searchBy', ['value']);
     set(component, 'options', [{
@@ -256,20 +243,19 @@ test('it handles backspaces', function() {
   });
 
   type(component, 'dark chocolate ch');
-  keyDown(component, 8);
-  keyDown(component, 8);
-  equal(get(component, 'value'), "Dark Chocolate Chocolate Chip");
+  assert.keyDown(component, 8);
+  assert.keyDown(component, 8);
+  assert.equal(get(component, 'value'), "Dark Chocolate Chocolate Chip");
   type(component, 'p');
-  equal(get(component, 'value'), "Dark Chocolate Peanut Butter Chip");
+  assert.equal(get(component, 'value'), "Dark Chocolate Peanut Butter Chip");
 });
 
-test('it resets the search string after 750ms', function() {
-  expect(2);
-
+test('it resets the search string after 750ms', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
   });
+
   run(function () {
     set(component, 'searchBy', ['value']);
     set(component, 'options', [{
@@ -288,50 +274,47 @@ test('it resets the search string after 750ms', function() {
   });
 
   type(component, 'dark');
-  equal(get(component, 'value'), "Dark Chocolate Chocolate Chip");
+  assert.equal(get(component, 'value'), "Dark Chocolate Chocolate Chip");
 
-  stop();
   later(function() {
     type(component, 'choc');
-    equal(get(component, 'value'), "Chocolate Chip Walnut");
-    start();
+    assert.equal(get(component, 'value'), "Chocolate Chip Walnut");
   }, 800);
 });
 
-test('it toggles whether the menu is active using spacebar', function() {
-  expect(2);
-
+test('it toggles whether the menu is active using spacebar', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
   });
+
   type(component, ' ');
-  ok(get(component, 'isActive'));
+  assert.ok(get(component, 'isActive'));
+
   type(component, ' ');
-  ok(!get(component, 'isActive'));
+  assert.notOk(get(component, 'isActive'));
 });
 
-test('it allows tabs to pass through', function() {
-  expect(3);
-
+test('it allows tabs to pass through', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
   });
+
   type(component, ' ');
-  ok(get(component, 'isActive'));
+  assert.ok(get(component, 'isActive'));
   keyDown(component, 9);
-  ok(!get(component, 'isActive'));
-  ok(!defaultPrevented);
+
+  assert.notOk(get(component, 'isActive'));
+  assert.ok(!defaultPrevented);
 });
 
-test('it allows selection using up and down arrows', function() {
-  expect(8);
-
+test('it allows selection using up and down arrows', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
   });
+
   run(function () {
     set(component, 'options', [{
       value: "A",
@@ -351,26 +334,27 @@ test('it allows selection using up and down arrows', function() {
   var UP = 38;
   var DOWN = 40;
 
-  stop();
-  later(function () {
+  return new RSVP.Promise(function (resolve) {
+    return later(resolve);
+  }).then(function () {
     keyDown(component, DOWN);
-    equal(get(component, 'value'), "A");
-    ok(get(component, 'isActive'));
+    assert.equal(get(component, 'value'), "A");
+    assert.ok(get(component, 'isActive'));
 
     keyDown(component, UP);
-    ok(get(component, 'value'), "A");
-
-    keyDown(component, DOWN);
-    ok(get(component, 'value'), "B");
+    assert.ok(get(component, 'value'), "A");
 
     keyDown(component, DOWN);
-    ok(get(component, 'value'), "C");
+    assert.ok(get(component, 'value'), "B");
 
     keyDown(component, DOWN);
-    ok(get(component, 'value'), "D");
+    assert.ok(get(component, 'value'), "C");
 
     keyDown(component, DOWN);
-    ok(get(component, 'value'), "D");
+    assert.ok(get(component, 'value'), "D");
+
+    keyDown(component, DOWN);
+    assert.ok(get(component, 'value'), "D");
 
     keyDown(component, UP);
     keyDown(component, UP);
@@ -378,18 +362,16 @@ test('it allows selection using up and down arrows', function() {
     keyDown(component, UP);
     keyDown(component, UP);
     keyDown(component, UP);
-    ok(get(component, 'value'), "A");
-    start();
+    assert.ok(get(component, 'value'), "A");
   });
 });
 
-test('it has an API for searching custom fields', function() {
-  expect(3);
-
+test('it has an API for searching custom fields', function (assert) {
   // creates the component instance
   var component = this.subject({
     popup: mock()
   });
+
   run(function () {
     set(component, 'options', [{
       value: "A",
@@ -411,12 +393,12 @@ test('it has an API for searching custom fields', function() {
     set(component, 'searchBy', "search");
   });
 
-  deepEqual(get(component, 'searchBy'), ['search']);
+  assert.deepEqual(get(component, 'searchBy'), ['search']);
 
   type(component, 'Z');
-  equal(get(component, 'value'), "D");
+  assert.equal(get(component, 'value'), "D");
   component.resetSearch();
 
   type(component, 'X');
-  equal(get(component, 'value'), "B");
+  assert.equal(get(component, 'value'), "B");
 });

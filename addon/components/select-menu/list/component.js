@@ -2,7 +2,7 @@ import Ember from 'ember';
 import stringify from '../../../computed/stringify';
 import ScrollSandbox from 'ember-pop-over/mixins/scroll_sandbox';
 
-const { computed: { reads, not } } = Ember;
+const { computed: { not } } = Ember;
 
 export default Ember.Component.extend(ScrollSandbox, {
 
@@ -10,7 +10,7 @@ export default Ember.Component.extend(ScrollSandbox, {
 
   classNames: ['select-menu_list'],
 
-  isHidden: not('popover.isVisible'),
+  isHidden: not('isExpanded'),
 
   // .............................................
   // WAI ARIA attributes
@@ -23,8 +23,6 @@ export default Ember.Component.extend(ScrollSandbox, {
 
   ariaRole: 'listbox',
   'aria-hidden': stringify('isHidden'),
-  'aria-labelledby': reads('menu.label.elementId'),
-  'aria-disabled': stringify('menu.disabled'),
-  'aria-activedescendant': reads('menu.activeDescendant.elementId')
+  'aria-disabled': stringify('disabled'),
 
 });
