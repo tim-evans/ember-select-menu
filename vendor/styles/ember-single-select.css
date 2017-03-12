@@ -2,7 +2,7 @@ html, body {
   margin: 20px;
 }
 
-.select-menu_label {
+.single-select_label {
   transition: all 120ms;
   display: block;
   -webkit-user-select: none;
@@ -23,25 +23,25 @@ html, body {
   margin-bottom: 10px;
 }
 
-.select-menu_label.is-prompting {
+.single-select_label.is-prompting {
   color: #999;
 }
 
-.select-menu_label:hover,
-.select-menu_label.hover,
-.select-menu_label:focus {
+.single-select_label:hover,
+.single-select_label.hover,
+.single-select_label:focus {
   background-color: #333;
   text-decoration: none;
 }
 
-.select-menu_label:active,
-.select-menu_label.expanded {
+.single-select_label:active,
+.single-select_label.expanded {
   color: #FFF;
   background-color: blue;
   text-decoration: none;
 }
 
-.select-menu_list {
+.single-select_list {
   padding: 20px;
   list-style: none;
   margin: 0;
@@ -93,7 +93,7 @@ html, body {
   text-decoration: none;
 }
 
-.select-menu {
+.single-select {
   font-size: 14px;
   outline: none;
 }

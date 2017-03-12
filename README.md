@@ -1,14 +1,14 @@
-# ember-cli {{select-menu}} [![Build Status](https://travis-ci.org/tim-evans/ember-select-menu.svg?branch=master)](https://travis-ci.org/tim-evans/ember-select-menu)
+# ember-cli {{single-select}} [![Build Status](https://travis-ci.org/tim-evans/ember-single-select.svg?branch=master)](https://travis-ci.org/tim-evans/ember-single-select)
 
 A simplified interface for custom select widgets. The handlebars is straightforward and easy to read:
 
 ```handlebars
 <label for="country">Where are you from?</label>
-{{#select-menu id="country" prompt="Select a country" value=country search-by="label code"}}
-  {{#each it in countries}}
-    {{select-option value=it label=it.name code=it.code}}
-  {{/each}}
-{{/select-menu}}
+{{#single-select id="country" value=country onchange=(action (mut country)) search-by="label code" as |country|}}
+  {{country.name}}
+{{else}}
+  Select a country
+{{/single-select}}
 ```
 
 This addon comes with baked in WAI-ARIA support for screen readers, keyboard navigation and keyboard search.

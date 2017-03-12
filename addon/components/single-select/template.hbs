@@ -1,7 +1,7 @@
-{{#select-menu/label
-  id=(concat 'select-menu_label_' elementId)
+{{#single-select/label
+  id=(concat 'single-select_label_' elementId)
   for=elementId
-  aria-owns=(concat 'select-menu_list_' elementId)
+  aria-owns=(concat 'single-select_list_' elementId)
   disabled=disabled
   expanded=isExpanded
   oninit=(action 'updatePrompt' (hasBlock 'inverse'))
@@ -11,26 +11,27 @@
   {{~else if (hasBlock 'inverse')~}}
     {{yield to='inverse'}}
   {{~/if}}
-{{~/select-menu/label~}}
+{{~/single-select/label~}}
 
 {{#pop-over
-  for=(concat 'select-menu_label_' elementId)
+  for=(concat 'single-select_label_' elementId)
   on='click hold'
-  flow="dropdown"
+  flow=flow
+  gravity=gravity
   disabled=disabled
   ondidinsert=(action (mut popover))
   onshow=(action (mut isExpanded) true)
   onhide=(action (mut isExpanded) false)~}}
-  {{#select-menu/list
-    id=(concat 'select-menu_list_' elementId)
+  {{#single-select/list
+    id=(concat 'single-select_list_' elementId)
     disabled=disabled
     isExpanded=isExpanded
-    aria-labelledby=(concat 'select-menu_label_' elementId)
+    aria-labelledby=(concat 'single-select_label_' elementId)
     aria-activedescendant=activeDescendantId~}}
     {{~#each options as |option idx|~}}
-      {{#select-menu/option id=(concat 'select-menu_option_' elementId '_' idx) value=option selection=value onselect=(action onchange option)~}}
+      {{#single-select/option id=(concat 'single-select_option_' elementId '_' idx) value=option selection=value onselect=(action onchange option)~}}
         {{yield option}}
-      {{~/select-menu/option}}
+      {{~/single-select/option}}
     {{~/each}}
-  {{~/select-menu/list}}
+  {{~/single-select/list}}
 {{~/pop-over~}}

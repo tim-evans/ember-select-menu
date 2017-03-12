@@ -8,7 +8,7 @@ export default Ember.Component.extend(ScrollSandbox, {
 
   tagName: 'ul',
 
-  classNames: ['select-menu_list'],
+  classNames: ['single-select_list'],
 
   isHidden: not('isExpanded'),
 

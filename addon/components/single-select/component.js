@@ -31,7 +31,7 @@ export default Ember.Component.extend({
 
   layout,
 
-  classNames: ['select-menu'],
+  classNames: ['single-select'],
 
   disabled: false,
 
@@ -44,7 +44,7 @@ export default Ember.Component.extend({
   /**
     The item of the content that is currently selected.
 
-    If the {{select-menu}} has a prompt, then the value
+    If the {{single-select}} has a prompt, then the value
     will by default be null. Otherwise, the value will
     be the first item in the content.
 
@@ -197,7 +197,11 @@ export default Ember.Component.extend({
       return [];
     },
     set(_, value) {
-      return (value || '').split(' ');
+      if (value) {
+        return value.split(' ');
+      } else {
+        return [];
+      }
     }
   }),
 
@@ -215,7 +219,7 @@ export default Ember.Component.extend({
 
     let options = get(this, 'options');
     let searchBy = get(this, 'search-by');
-    let searchIndex = get(this, 'searchIndex');
+    let searchIndex = get(this, 'searchIndex') || Ember.A();
 
     if (options && query && searchBy) {
       let length = get(options, 'length'),
@@ -238,6 +242,7 @@ export default Ember.Component.extend({
           return true;
         }
         for (let i = 0; i < searchBy.length; i++) {
+          console.log(option, searchBy[i]);
           if (String(get(option, searchBy[i]) || '').toUpperCase().indexOf(query) === 0) {
             return true;
           }
@@ -249,7 +254,7 @@ export default Ember.Component.extend({
       // for the next match
       for (let i = start; i < length; i++) {
         let option = Ember.A(options).objectAt(i);
-        let text = searchIndex.objectAt(i);
+        let text = searchIndex.objectAt(i) || '';
         match = hasMatch(option, text);
 
         // Break on the first match,
@@ -294,7 +299,7 @@ export default Ember.Component.extend({
       }).then(({ options, value }) => {
         let index = options.indexOf(value);
         set(this, 'unwrappedValue', value);
-        set(this, 'activeDescendantId', `select-menu_option_${get(this, 'elementId')}_${index}`);
+        set(this, 'activeDescendantId', `single-select_option_${get(this, 'elementId')}_${index}`);
       });
     } else {
       set(this, 'activeDescendantId', null);
@@ -304,7 +309,7 @@ export default Ember.Component.extend({
   didRender() {
     // Scroll to the active descendant
     if (get(this, 'isExpanded') && get(this, 'activeDescendantId')) {
-      let $list = this.$(`#select-menu_list_${get(this, 'elementId')}`);
+      let $list = this.$(`#single-select_list_${get(this, 'elementId')}`);
       let listBox = getLayout($list[0]);
       let $option = this.$(`#${get(this, 'activeDescendantId')}`);
       let scrollTop = $list.scrollTop();

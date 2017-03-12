@@ -1,5 +1,5 @@
 {
-  "name": "ember-select-menu",
+  "name": "ember-single-select",
   "version": "0.1.8",
   "directories": {
     "doc": "doc",
@@ -10,7 +10,7 @@
     "build": "ember build",
     "test": "ember try:each"
   },
-  "repository": "https://github.com/tim-evans/ember-select-menu",
+  "repository": "https://github.com/tim-evans/ember-single-select",
   "engines": {
     "node": ">= 0.10.0"
   },

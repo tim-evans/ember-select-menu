@@ -11,7 +11,7 @@ export default Ember.Component.extend({
 
   layout,
 
-  classNames: ['select-menu_label'],
+  classNames: ['single-select_label'],
 
   attributeBindings: ['aria-haspopup',
                       'aria-disabled',

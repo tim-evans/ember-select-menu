@@ -1,6 +1,6 @@
 <label for="country">Country</label>
-{{#select-menu id="country" options=model value=country onchange=(action (mut country)) as |option|}}
+{{#single-select id="country" options=model value=country onchange=(action (mut country)) as |option|}}
   {{option.name}}
 {{else}}
   Select the country...
-{{/select-menu}}
+{{/single-select}}

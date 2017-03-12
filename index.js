@@ -1,9 +1,9 @@
 /* global node: true */
 module.exports = {
-  name: 'ember-select-menu',
+  name: 'ember-single-select',
 
   included: function (app) {
     this._super.included(app);
-    app.import("vendor/styles/ember-select-menu.css");
+    app.import("vendor/styles/ember-single-select.css");
   }
 };
