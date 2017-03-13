@@ -323,6 +323,13 @@ export default Ember.Component.extend({
     set(this, 'query', null);
   },
 
+  willDestroyElement() {
+    this._super(...arguments);
+    if (this.__timer) {
+      clearTimeout(this.__timer);
+    }
+  },
+
   didReceiveAttrs() {
     if (get(this, 'value')) {
       RSVP.hash({
