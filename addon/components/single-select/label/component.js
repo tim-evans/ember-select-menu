@@ -1,5 +1,4 @@
 import Ember from "ember";
-import $ from 'jquery';
 import stringify from '../../../computed/stringify';
 import layout from './template';
 
@@ -41,14 +40,23 @@ export default Ember.Component.extend({
     select menu.
    */
   didInsertElement() {
-    let selector = `label[for="${get(this, 'for')}"]`;
+    let label = document.querySelector(`label[for="${get(this, 'for')}"]`);
+    if (label == null) { return; }
+
     let eventManager = this._eventManager = {
-      mouseenter: bind(this, 'set', 'isHovering', true),
-      mouseleave: bind(this, 'set', 'isHovering', false)
+      click: bind(this, () => {
+        get(this, 'open')();
+      }),
+      mouseenter: bind(this, () => {
+        this.set('isHovering', true);
+      }),
+      mouseleave: bind(this, () => {
+        this.set('isHovering', false);
+      })
     };
 
     Object.keys(eventManager).forEach(function (event) {
-      $(document).on(event, selector, eventManager[event]);
+      label.addEventListener(event, eventManager[event]);
     });
   },
 
@@ -56,11 +64,13 @@ export default Ember.Component.extend({
     Cleanup event delegation.
    */
   willDestroyElement() {
-    let selector = `label[for="${get(this, 'elementId')}"]`;
+    let label = document.querySelector(`label[for="${get(this, 'for')}"]`);
+    if (label == null) { return; }
+
     let eventManager = this._eventManager;
 
     Object.keys(eventManager).forEach(function (event) {
-      $(document).off(event, selector, eventManager[event]);
+      label.removeEventListener(event, eventManager[event]);
     });
   },
 

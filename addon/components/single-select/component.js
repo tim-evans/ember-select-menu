@@ -385,6 +385,9 @@ export default Ember.Component.extend({
           get(this, 'onchange')(firstOption);
         });
       }
+    },
+    show() {
+      get(this, 'popover').show();
     }
   }
 

@@ -4,6 +4,7 @@
   aria-owns=(concat 'single-select_list_' elementId)
   disabled=disabled
   expanded=isExpanded
+  open=(action 'show')
   oninit=(action 'updatePrompt' (hasBlock 'inverse'))
   activeDescendant=activeDescendantId~}}
   {{#if value~}}

@@ -5,8 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import { keyEvent, click, triggerEvent } from 'ember-native-dom-helpers/test-support/helpers';
 import {
   moduleForComponent,
-  test,
-  skip
+  test
 } from 'ember-qunit';
 
 var wait = function (ms) {
@@ -277,6 +276,7 @@ test('it has an API for searching custom fields', async function (assert) {
 
 test("clicking on the label will open the menu", async function (assert) {
   this.render();
+  await wait();
   await click("label[for='cookie']");
 
   assert.equal(this.$('a').attr('aria-expanded'), "true");
@@ -284,17 +284,19 @@ test("clicking on the label will open the menu", async function (assert) {
 
 test("hovering over the label will trigger a hover class on the simple-select label", async function (assert) {
   this.render();
-  await triggerEvent("label", "mouseenter");
+  await triggerEvent('label[for="cookie"]', "mouseenter");
+  await wait();
 
   assert.ok(this.$('a').hasClass('hover'));
 
-  await triggerEvent("label", "mouseleave");
+  await triggerEvent('label[for="cookie"]', "mouseleave");
+  await wait();
 
   assert.notOk(this.$('a').hasClass('hover'));
 });
 
 test("searching for an option will focus it into view", async function (assert) {
-  this.set('options', 'abcdefghijklmnopqrstuvwxyz'.split('').map((chr) => { value: chr }));
+  this.set('options', 'abcdefghijklmnopqrstuvwxyz'.split('').map((chr) => { return { value: chr }; }));
 
   this.render();
   await this.type('z');
@@ -310,12 +312,14 @@ test("searching for an option will focus it into view", async function (assert) 
 });
 
 test("using up and down arrows will focus the element into view", async function (assert) {
-  this.set('options', 'abcdefghijklmnopqrstuvwxyz'.split('').map((chr) => { value: chr }));
+  this.set('options', 'abcdefghijklmnopqrstuvwxyz'.split('').map((value) => { return { value } }));
 
   this.render();
 
   const UP = 38;
   const DOWN = 40;
+
+  await click('a');
 
   for (var i = 0; i < 7; i++) {
     await this.keyDown(DOWN);
@@ -324,7 +328,6 @@ test("using up and down arrows will focus the element into view", async function
 
   await this.keyDown(DOWN);
   assert.ok(this.$('ul').scrollTop() > 0);
-
   for (i = 0; i < 6; i++) {
     await this.keyDown(UP);
     assert.ok(this.$('ul').scrollTop() > 0);
