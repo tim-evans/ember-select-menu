@@ -1,5 +1,7 @@
+import Ember from 'ember';
+
 export default function () {
-  let duration = 150;
+  let duration = Ember.testing ? 0 :150;
   let easing = 'ease-in-out';
 
   this.transition(
