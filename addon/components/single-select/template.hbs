@@ -28,9 +28,9 @@
     isExpanded=isExpanded
     aria-labelledby=(concat 'single-select_label_' elementId)
     aria-activedescendant=activeDescendantId~}}
-    {{~#each options as |option idx|~}}
-      {{#single-select/option id=(concat 'single-select_option_' elementId '_' idx) value=option selection=value onselect=(action onchange option)~}}
-        {{yield option}}
+    {{~#each displayOptions as |option idx|~}}
+      {{#single-select/option id=(concat 'single-select_option_' elementId '_' idx) value=option.value selection=value onselect=(action onchange option.value) disabled=option.disabled~}}
+        {{yield option.value}}
       {{~/single-select/option}}
     {{~/each}}
   {{~/single-select/list}}

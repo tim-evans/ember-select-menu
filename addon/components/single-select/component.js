@@ -3,7 +3,7 @@ import RSVP from 'rsvp';
 import layout from './template';
 import { getLayout } from "dom-ruler";
 
-const { get, set, run: { cancel, later }, computed: { reads } } = Ember;
+const { get, set, run, computed, computed: { reads } } = Ember;
 
 // Key code mappings
 const ESC              = 27,
@@ -41,6 +41,35 @@ export default Ember.Component.extend({
 
   isExpanded: reads('popover.isActive'),
 
+  displayOptions: computed('options.[]', 'disabledOptions.[]', {
+    get() {
+      let displayOptions = [];
+      let options = get(this, 'options');
+      let disabledOptions = get(this, 'disabledOptions') || [];
+
+      for (let i = 0, len = options.length; i < len; i++) {
+        displayOptions.push({
+          disabled: disabledOptions.indexOf(options[i]) !== -1,
+          value: options[i]
+        });
+      }
+      return displayOptions;
+    }
+  }),
+
+  enabledOptions: computed('displayOptions', {
+    get() {
+      let options = get(this, 'displayOptions');
+      let enabledOptions = [];
+      for (let i = 0, len = options.length; i < len; i++) {
+        if (!options[i].disabled) {
+          enabledOptions.push(options[i].value);
+        }
+      }
+      return enabledOptions;
+    }
+  }),
+
   /**
     The item of the content that is currently selected.
 
@@ -59,6 +88,7 @@ export default Ember.Component.extend({
    */
   keyDown(evt) {
     let code = evt.keyCode ? evt.keyCode : evt.which;
+    let chr = String.fromCharCode(code);
     let query = get(this, 'query');
     let popover = get(this, 'popover');
     let isExpanded = get(this, 'isExpanded');
@@ -127,8 +157,6 @@ export default Ember.Component.extend({
 
       break;
     default:
-      let chr = String.fromCharCode(code);
-
       // Append
       if (query) {
         this.search(query + chr);
@@ -153,7 +181,7 @@ export default Ember.Component.extend({
     Selects the next item in the option list.
    */
   selectNext() {
-    let options = get(this, 'options');
+    let options = get(this, 'enabledOptions');
     let value = get(this, 'value');
     let index;
 
@@ -173,7 +201,7 @@ export default Ember.Component.extend({
     Selects the previous item in the option list.
    */
   selectPrevious() {
-    let options = get(this, 'options');
+    let options = get(this, 'enabledOptions');
     let value = get(this, 'value');
     let index;
 
@@ -214,10 +242,11 @@ export default Ember.Component.extend({
     set(this, 'query', query);
 
     if (this.__timer) {
-      cancel(this.__timer);
+      clearTimeout(this.__timer);
+      this.__timer = null;
     }
 
-    let options = get(this, 'options');
+    let options = get(this, 'enabledOptions');
     let searchBy = get(this, 'search-by');
     let searchIndex = get(this, 'searchIndex') || Ember.A();
 
@@ -242,7 +271,6 @@ export default Ember.Component.extend({
           return true;
         }
         for (let i = 0; i < searchBy.length; i++) {
-          console.log(option, searchBy[i]);
           if (String(get(option, searchBy[i]) || '').toUpperCase().indexOf(query) === 0) {
             return true;
           }
@@ -278,7 +306,11 @@ export default Ember.Component.extend({
     }
 
     if (query) {
-      this.__timer = later(this, this.resetSearch, 750);
+      this.__timer = setTimeout(() => {
+        if (!this.isDestroyed) {
+          run(this, 'resetSearch');
+        }
+      }, 750);
     }
   },
 

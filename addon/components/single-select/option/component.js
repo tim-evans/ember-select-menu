@@ -2,7 +2,7 @@ import Ember from 'ember';
 import stringify from '../../../computed/stringify';
 import layout from './template';
 
-const { get, set, computed, computed: { reads }, isEqual } = Ember;
+const { get, set, computed, isEqual } = Ember;
 
 export default Ember.Component.extend({
 
