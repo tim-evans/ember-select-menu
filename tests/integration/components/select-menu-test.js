@@ -321,14 +321,14 @@ test("using up and down arrows will focus the element into view", async function
 
   await click('a');
 
-  for (var i = 0; i < 7; i++) {
+  for (var i = 0; i < 6; i++) {
     await this.keyDown(DOWN);
     assert.equal(this.$('ul').scrollTop(), 0);
   }
 
   await this.keyDown(DOWN);
   assert.ok(this.$('ul').scrollTop() > 0);
-  for (i = 0; i < 6; i++) {
+  for (i = 0; i < 5; i++) {
     await this.keyDown(UP);
     assert.ok(this.$('ul').scrollTop() > 0);
   }
@@ -392,11 +392,19 @@ test("WAI-ARIA / option", async function (assert) {
   assert.equal(peanutButter.attr('aria-label'), "Dark Chocolate Peanut Butter Chip");
 
   await click(peanutButter[0]);
+  await click('#cookie a');
+
+  chocolateChip = this.$("li:first-child");
+  peanutButter = this.$("li:last-child");
 
   assert.equal(chocolateChip.attr('aria-selected'), "false");
   assert.equal(peanutButter.attr('aria-selected'), "true");
 
   await click(chocolateChip[0]);
+  await click('#cookie a');
+
+  chocolateChip = this.$("li:first-child");
+  peanutButter = this.$("li:last-child");
 
   assert.equal(chocolateChip.attr('aria-selected'), "true");
   assert.equal(peanutButter.attr('aria-selected'), "false");

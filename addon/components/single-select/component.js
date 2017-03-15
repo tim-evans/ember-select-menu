@@ -357,7 +357,9 @@ export default Ember.Component.extend({
       let optionTop = scrollTop + $option.position().top;
       let optionBottom = optionTop + getLayout($option[0]).margins.height;
 
-      if (optionTop < scrollTop) {
+      if (get(this, 'value') === get(this, 'options.0')) {
+        $list.scrollTop(0);
+      } else if (optionTop < scrollTop) {
         $list.scrollTop(optionTop - listBox.padding.top);
       } else if (optionBottom > scrollBottom) {
         $list.scrollTop(optionBottom - listBox.padding.height + listBox.padding.bottom);
