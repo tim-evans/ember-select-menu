@@ -49,6 +49,7 @@
     "ember-addon"
   ],
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "demoURL": "https://tim-evans.github.io/ember-single-select"
   }
 }

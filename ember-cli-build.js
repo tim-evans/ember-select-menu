@@ -9,7 +9,7 @@ module.exports = function(defaults) {
     },
     fingerprint: {
       extensions: ['js', 'css', 'png', 'jpg', 'gif', 'map', 'eot', 'ttf', 'woff', 'woff2', 'svg'],
-      prepend: '/ember-page-title/'
+      prepend: '/ember-single-select/'
     },
     sassOptions: {
       includePaths: ['tests/dummy/app']
