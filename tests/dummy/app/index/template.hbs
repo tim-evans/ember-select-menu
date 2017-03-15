@@ -24,8 +24,10 @@
     <section id="demo">
       <h2>Demo</h2>
       <div class="grid">
-        {{#single-select gravity='n' value=model.role onchange=(action (mut model.role)) options=model.roles as |option|}}
-          {{option}}
+        {{#single-select gravity='n' value=country onchange=(action (mut country)) options=model as |option|}}
+          {{option.name}}
+        {{else}}
+          Select a Country...
         {{/single-select}}
       </div>
     </section>
