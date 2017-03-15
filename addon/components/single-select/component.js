@@ -373,6 +373,10 @@ export default Ember.Component.extend({
   },
 
   actions: {
+    select(value) {
+      get(this, 'onchange')(value);
+      get(this, 'popover').hide();
+    },
     updatePrompt(hasPrompt) {
       set(this, 'hasPrompt', hasPrompt);
       if (!hasPrompt) {

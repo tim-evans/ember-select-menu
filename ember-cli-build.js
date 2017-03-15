@@ -6,6 +6,18 @@ module.exports = function(defaults) {
   var app = new EmberAddon(defaults, {
     babel: {
       includePolyfill: true
+    },
+    fingerprint: {
+      extensions: ['js', 'css', 'png', 'jpg', 'gif', 'map', 'eot', 'ttf', 'woff', 'woff2', 'svg'],
+      prepend: '/ember-page-title/'
+    },
+    sassOptions: {
+      includePaths: ['tests/dummy/app']
+    },
+    svg: {
+      paths: [
+        'tests/dummy/public/assets/images'
+      ]
     }
   });
 

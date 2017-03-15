@@ -1,0 +1,33 @@
+<div id='index'>
+  <header>
+    <h1>{{inline-svg 'icon'}} ember-single-select</h1><nav>
+      <a href="#demo">Demo</a>
+      <a href="https://github.com/tim-evans/ember-single-select" target="__blank">GitHub</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <p>Single selects <br>for {{inline-svg 'ember-logo' title="Ember"}} apps</p>
+    <a class="more" href="#installation">{{inline-svg 'arrow'}}</a>
+  </div>
+
+  <main>
+    <section id="installation">
+      <h2>Installation</h2>
+      <div class="grid">
+        {{#window-pane}}
+          <span class="ps1">&gt; </span>ember install ember-single-select
+        {{/window-pane}}
+      </div>
+    </section>
+
+    <section id="demo">
+      <h2>Demo</h2>
+      <div class="grid">
+        {{#single-select gravity='n' value=model.role onchange=(action (mut model.role)) options=model.roles as |option|}}
+          {{option}}
+        {{/single-select}}
+      </div>
+    </section>
+  </main>
+</div>
