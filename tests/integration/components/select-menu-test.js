@@ -1,4 +1,5 @@
-import Ember from 'ember';
+import { A } from '@ember/array';
+import { later } from '@ember/runloop';
 import RSVP from 'rsvp';
 import { getLayout } from "dom-ruler";
 import hbs from 'htmlbars-inline-precompile';
@@ -10,14 +11,14 @@ import {
 
 var wait = function (ms) {
   return new RSVP.Promise((resolve) => {
-    Ember.run.later(resolve, ms);
+    later(resolve, ms);
   });
 }
 
 moduleForComponent('single-select', {
   integration: true,
   beforeEach() {
-    this.set('options', Ember.A([{
+    this.set('options', A([{
       value: "Chocolate Chip Walnut"
     }, {
       value: "Oatmeal Raisin Cookie"

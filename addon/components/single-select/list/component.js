@@ -1,10 +1,9 @@
-import Ember from 'ember';
+import Component from '@ember/component';
+import { not } from '@ember/object/computed';
 import stringify from '../../../computed/stringify';
 import ScrollSandbox from 'ember-pop-over/mixins/scroll_sandbox';
 
-const { computed: { not } } = Ember;
-
-export default Ember.Component.extend(ScrollSandbox, {
+export default Component.extend(ScrollSandbox, {
 
   tagName: 'ul',
 

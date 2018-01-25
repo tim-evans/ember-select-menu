@@ -1,9 +1,11 @@
-import Ember from 'ember';
+import { A } from '@ember/array';
+import Component from '@ember/component';
+import { run } from '@ember/runloop';
+import { computed, set, get } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import RSVP from 'rsvp';
 import layout from './template';
 import { getLayout } from "dom-ruler";
-
-const { get, set, run, computed, computed: { reads } } = Ember;
 
 // Key code mappings
 const ESC              = 27,
@@ -27,7 +29,7 @@ const ESC              = 27,
       NUM_LOCK         = 144,
       SCROLL_LOCK      = 145;
 
-export default Ember.Component.extend({
+export default Component.extend({
 
   layout,
 
@@ -192,7 +194,7 @@ export default Ember.Component.extend({
         index = -1;
       }
 
-      let option = Ember.A(options).objectAt(Math.min(index + 1, get(options, 'length') - 1));
+      let option = A(options).objectAt(Math.min(index + 1, get(options, 'length') - 1));
       get(this, 'onchange')(option);
     }
   },
@@ -212,7 +214,7 @@ export default Ember.Component.extend({
         index = get(options, 'length');
       }
 
-      let option = Ember.A(options).objectAt(Math.max(index - 1, 0));
+      let option = A(options).objectAt(Math.max(index - 1, 0));
       get(this, 'onchange')(option);
     }
   },
@@ -220,7 +222,7 @@ export default Ember.Component.extend({
   /**
     Search by value of the object
    */
-  'search-by': Ember.computed({
+  'search-by': computed({
     get() {
       return [];
     },
@@ -248,7 +250,7 @@ export default Ember.Component.extend({
 
     let options = get(this, 'enabledOptions');
     let searchBy = get(this, 'search-by');
-    let searchIndex = get(this, 'searchIndex') || Ember.A();
+    let searchIndex = get(this, 'searchIndex') || A();
 
     if (options && query && searchBy) {
       let length = get(options, 'length'),
@@ -281,7 +283,7 @@ export default Ember.Component.extend({
       // Search from the current value
       // for the next match
       for (let i = start; i < length; i++) {
-        let option = Ember.A(options).objectAt(i);
+        let option = A(options).objectAt(i);
         let text = searchIndex.objectAt(i) || '';
         match = hasMatch(option, text);
 
@@ -368,7 +370,7 @@ export default Ember.Component.extend({
 
     if (get(this, 'isExpanded') && get(this, 'searchIndex') == null) {
       let $options = this.$('ul li');
-      set(this, 'searchIndex', Ember.A($options.map(function () {
+      set(this, 'searchIndex', A($options.map(function () {
         return this.innerHTML.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '').toUpperCase();
       }).toArray()));
     }
@@ -386,7 +388,7 @@ export default Ember.Component.extend({
           options: get(this, 'options'),
           value: get(this, 'value')
         }).then(({ value, options }) => {
-          let firstOption = get(Ember.A(options || []), 'firstObject');
+          let firstOption = get(A(options || []), 'firstObject');
           if (this.isDestroyed && value != null) { return; }
           get(this, 'onchange')(firstOption);
         });

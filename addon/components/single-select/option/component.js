@@ -1,10 +1,10 @@
-import Ember from 'ember';
+import Component from '@ember/component';
+import { computed, set, get } from '@ember/object';
+import { isEqual } from '@ember/utils';
 import stringify from '../../../computed/stringify';
 import layout from './template';
 
-const { get, set, computed, isEqual } = Ember;
-
-export default Ember.Component.extend({
+export default Component.extend({
 
   layout,
 

@@ -1,10 +1,11 @@
-import Ember from "ember";
+import Component from '@ember/component';
+import { set, get } from '@ember/object';
+import { not } from '@ember/object/computed';
+import { bind } from '@ember/runloop';
 import stringify from '../../../computed/stringify';
 import layout from './template';
 
-const { get, set, computed: { not }, run: { bind } } = Ember;
-
-export default Ember.Component.extend({
+export default Component.extend({
 
   tagName: 'a',
 
